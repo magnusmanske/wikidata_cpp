@@ -49,7 +49,7 @@ size_t WikibaseAPI::WriteMemoryCallback(void *contents, size_t size, size_t nmem
 	struct CURLMemoryStruct *mem = (struct CURLMemoryStruct *)userp;
 
 	mem->memory = (char*) realloc(mem->memory, mem->size + realsize + 1);
-	if(mem->memory == NULL) throw "WikibaseAPI::WriteMemoryCallback: out of memory" ;
+	if(mem->memory == NULL) throw WikibaseException ( "WikibaseAPI::WriteMemoryCallback: out of memory" ) ;
 
 	memcpy(&(mem->memory[mem->size]), contents, realsize);
 	mem->size += realsize;
@@ -62,7 +62,7 @@ json WikibaseAPI::loadJSONfromURL ( string url , string post_parameters , uint8_
 	json j ;
 	CURL *curl;
 	curl = curl_easy_init();
-	if ( !curl ) throw "WikibaseAPI::loadJSONfromURL: CURL does not init" ;
+	if ( !curl ) throw WikibaseException ( "WikibaseAPI::loadJSONfromURL: CURL does not init" ) ;
 	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 	if ( !post_parameters.empty() ) {
 		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_parameters.c_str());
@@ -82,10 +82,8 @@ json WikibaseAPI::loadJSONfromURL ( string url , string post_parameters , uint8_
 	CURLcode res ;
 	try {
 		res = curl_easy_perform(curl);
-	} catch ( const char *s ) {
-		throw s ;
 	} catch ( ... ) {
-		throw "Problem with curl_easy_perform" ;
+		throw WikibaseException ( "Problem with curl_easy_perform" ) ;
 	}
 
 
@@ -95,9 +93,9 @@ json WikibaseAPI::loadJSONfromURL ( string url , string post_parameters , uint8_
 		return loadJSONfromURL ( url , post_parameters , depth+1 ) ;
 	}
 
-	if (res != CURLE_OK) throw "WikibaseAPI::loadJSONfromCURL: CURL not OK" ;
-	if ( chunk.size == 0 ) throw "WikibaseAPI::loadJSONfromCURL: Chunk size 0" ;
-	if ( !chunk.memory ) throw "WikibaseAPI::loadJSONfromCURL: No memory" ;
+	if (res != CURLE_OK) throw WikibaseException ( "WikibaseAPI::loadJSONfromCURL: CURL not OK" ) ;
+	if ( chunk.size == 0 ) throw WikibaseException ( "WikibaseAPI::loadJSONfromCURL: Chunk size 0" ) ;
+	if ( !chunk.memory ) throw WikibaseException ( "WikibaseAPI::loadJSONfromCURL: No memory" ) ;
 
 	char *text = chunk.memory ;
 	curl_easy_cleanup(curl);
@@ -138,8 +136,8 @@ json WikibaseAPI::runQuery ( json query ) {
 	json ret ;
 	try {
 		ret = loadJSONfromURL ( url , parameters ) ;
-	} catch ( const char *s ) {
-		cerr << "WikibaseAPI::runQuery: On URL " << url << endl << "exception: " << s << endl ;
+	} catch ( const WikibaseException e ) {
+		cerr << "WikibaseAPI::runQuery: On URL " << url << endl << "exception: " << e.what() << endl ;
 		exit(1) ;
 	} catch ( ... ) {
 		cerr << "WikibaseAPI::runQuery: On URL " << url << " exception " << endl ;

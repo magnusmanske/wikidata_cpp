@@ -30,7 +30,7 @@ void WikibaseEntities::loadEntities ( const WikibaseEntityList &load_entities ) 
 	map <WikibaseID,bool> already_loading ;
 	for ( auto &entity:load_entities ) {
 		if ( entity.empty() ) continue ; // Tolerate empty strings
-		if ( !WikibaseEntity::isValidID(entity) ) throw "WikibaseEntities::loadEntities: Invalid ID " + entity ;
+		if ( !WikibaseEntity::isValidID(entity) ) throw WikibaseException ( "WikibaseEntities::loadEntities: Invalid ID " + entity ) ;
 		if ( isEntityLoaded(entity) ) continue ;
 		if ( already_loading.find(entity) != already_loading.end() ) continue ;
 		already_loading[entity] = true ;

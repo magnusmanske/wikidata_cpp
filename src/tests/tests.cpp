@@ -34,6 +34,26 @@ TEST(WikibaseEntity, id_check) {
 	ASSERT_FALSE(WikibaseEntity::isValidID("Foobar"));
 	}
 
+TEST(WikibaseEntity, detail_check) {
+	auto api = std::make_shared<WikibaseAPI>() ;
+	WikibaseEntity item ("Q12345",api) ;
+	ASSERT_TRUE(item.hasLabelInLanguage("en")) ;
+	ASSERT_FALSE(item.hasLabelInLanguage("this-is-not-a-language-code")) ;
+	ASSERT_EQ(item.getLabelInLanguage("en"),"Count von Count") ;
+
+	ASSERT_TRUE(item.hasDescriptionInLanguage("en")) ;
+	ASSERT_FALSE(item.hasDescriptionInLanguage("this-is-not-a-language-code")) ;
+	ASSERT_EQ(item.getDescriptionInLanguage("en"),"character on Sesame Street") ; // This might change on source
+
+	ASSERT_TRUE(item.hasAliasesInLanguage("en")) ;
+	ASSERT_FALSE(item.hasAliasesInLanguage("this-is-not-a-language-code")) ;
+	ASSERT_GE(item.getAliasesInLanguage("en").size(),1) ;
+
+	ASSERT_EQ(item.getEntityType(),"item") ;
+	ASSERT_EQ(item.getPageID(),13925) ;
+	ASSERT_EQ(item.getPageTitle(),"Q12345") ;
+}
+
 TEST(WikibaseEntities, load_check) {
 	WikibaseEntities wel ;
 	WikibaseEntityList entities = { "Q12345","P31","Q12345" } ;

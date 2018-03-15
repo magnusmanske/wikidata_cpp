@@ -2,7 +2,7 @@
 #define __wikibase_H__
 
 #include <string>
-#include "../vendor/json.hpp"
+#include "../vendor/json.hpp" // https://github.com/nlohmann/json
 
 using namespace std ;
 using json = nlohmann::json;
@@ -10,6 +10,18 @@ using json = nlohmann::json;
 typedef char WikibaseEntityType ;
 typedef string WikibaseID ;
 typedef vector <WikibaseID> WikibaseEntityList ;
+
+class WikibaseException : public std::exception {
+public:
+    explicit WikibaseException(const std::string& message, const std::string method_name = "" ): message(message),method_name(method_name) {}
+    virtual ~WikibaseException() throw (){}
+    virtual const char* what() const throw () {
+    	string ret = message ;
+    	if ( !method_name.empty() ) ret += " [in " + method_name + "]" ;
+    	return ret.c_str();
+    }
+    string message , method_name ;
+} ;
 
 class WikibaseAPI {
 public:
@@ -38,14 +50,29 @@ public:
 	WikibaseEntity ( WikibaseID id ) : id(id) {}
 	WikibaseEntity ( WikibaseID id , std::shared_ptr<WikibaseAPI> api ) ;
 	WikibaseEntity ( json &j , std::shared_ptr<WikibaseAPI> api ) ;
-	bool isInitialized() { return !id.empty() ; }
 	void loadDataFromApi ( std::shared_ptr<WikibaseAPI> _api ) ;
+
+	bool isInitialized() { return !id.empty() ; }
+	bool isDataLoaded() { return !j.empty() ; }
 	static bool isValidID ( WikibaseID id ) ;
+
 	static WikibaseEntityType getType ( const WikibaseID &id ) ;
 	WikibaseEntityType getType () { return getType(id) ; }
 	string getEntityURL() ;
 	string getWebURL() ;
-	bool isDataLoaded() { return !j.empty() ; }
+
+	// Property access
+	bool hasLabelInLanguage ( string language_code ) ;
+	bool hasAliasesInLanguage ( string language_code ) ;
+	bool hasDescriptionInLanguage ( string language_code ) ;
+	string getLabelInLanguage ( string language_code ) ;
+	vector <string> getAliasesInLanguage ( string language_code ) ;
+	string getDescriptionInLanguage ( string language_code ) ;
+	string getEntityType () { return j.at("type") ; }
+	int32_t getPageID () { return j.at("pageid") ; }
+	int32_t getLastRevisionID () { return j.at("lastrevid") ; }
+	string getPageTitle() { return j.at("title") ; }
+	string getLastModificationDate() { return j.at("modified") ; }
 
 protected:
 	WikibaseID id ;
