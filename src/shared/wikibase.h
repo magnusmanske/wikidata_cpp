@@ -81,6 +81,8 @@ public:
 
 	bool hasClaimsForProperty ( WikibaseID property ) ;
 	json getClaimsForProperty ( WikibaseID property ) ;
+	WikibaseID getTargetItemFromSnak ( const json &snak ) ;
+	string getStringFromSnak ( const json &snak ) ;
 	vector <WikibaseID> getTargetItemsFromClaims ( const json &claims ) ;
 	vector <WikibaseID> getTargetItemsForProperty ( WikibaseID property ) { return getTargetItemsFromClaims ( getClaimsForProperty ( property ) ) ; }
 	vector <string> getStringsFromClaims ( const json &claims ) ;

@@ -136,15 +136,27 @@ json WikibaseEntity::getClaimsForProperty ( WikibaseID property ) {
 }
 
 
+WikibaseID WikibaseEntity::getTargetItemFromSnak ( const json &snak ) {
+	if ( snak.at("snaktype") != "value" ) return "" ;
+	if ( snak.at("datatype") != "wikibase-item" ) return "" ;
+	if ( snak.at("datavalue").at("type") != "wikibase-entityid" ) return "" ;
+	return snak["datavalue"]["value"].at("id") ;
+}
+
+string WikibaseEntity::getStringFromSnak ( const json &snak ) {
+	if ( snak.at("snaktype") != "value" ) return "" ;
+//		if ( claim["mainsnak"].at("datatype") != "wikibase-item" ) continue ; // string, external-id??
+	if ( snak.at("datavalue").at("type") != "string" ) return "" ;
+	return snak["datavalue"].at("value") ;
+}
+
 vector <WikibaseID> WikibaseEntity::getTargetItemsFromClaims ( const json &claims ) {
 	vector <WikibaseID> ret ;
 	for ( auto &claim:claims ) {
 		if ( claim.at("type") != "statement" ) continue ;
 		if ( claim.count("mainsnak") == 0 ) continue ;
-		if ( claim["mainsnak"].at("snaktype") != "value" ) continue ;
-		if ( claim["mainsnak"].at("datatype") != "wikibase-item" ) continue ;
-		if ( claim["mainsnak"].at("datavalue").at("type") != "wikibase-entityid" ) continue ;
-		ret.push_back ( claim["mainsnak"]["datavalue"]["value"].at("id") ) ;
+		auto tmp = getTargetItemFromSnak ( claim["mainsnak"] ) ;
+		if ( !tmp.empty() ) ret.push_back ( tmp ) ;
 	}
 	return ret ;
 }
@@ -154,10 +166,8 @@ vector <string> WikibaseEntity::getStringsFromClaims ( const json &claims ) {
 	for ( auto &claim:claims ) {
 		if ( claim.at("type") != "statement" ) continue ;
 		if ( claim.count("mainsnak") == 0 ) continue ;
-		if ( claim["mainsnak"].at("snaktype") != "value" ) continue ;
-//		if ( claim["mainsnak"].at("datatype") != "wikibase-item" ) continue ; // string, external-id??
-		if ( claim["mainsnak"].at("datavalue").at("type") != "string" ) continue ;
-		ret.push_back ( claim["mainsnak"]["datavalue"].at("value") ) ;
+		auto tmp = getStringFromSnak ( claim["mainsnak"] ) ;
+		if ( !tmp.empty() ) ret.push_back ( tmp ) ;
 	}
 	return ret ;
 }
