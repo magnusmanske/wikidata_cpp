@@ -79,6 +79,13 @@ public:
 	string getSitelinkToWiki ( string wiki ) ;
 	vector <string> getBadgesInWiki ( string wiki ) ;
 
+	bool hasClaimsForProperty ( WikibaseID property ) ;
+	json getClaimsForProperty ( WikibaseID property ) ;
+	vector <WikibaseID> getTargetItemsFromClaims ( const json &claims ) ;
+	vector <WikibaseID> getTargetItemsForProperty ( WikibaseID property ) { return getTargetItemsFromClaims ( getClaimsForProperty ( property ) ) ; }
+	vector <string> getStringsFromClaims ( const json &claims ) ;
+	vector <string> getStringsForProperty ( WikibaseID property ) { return getStringsFromClaims ( getClaimsForProperty ( property ) ) ; }
+
 
 	// TODO: claims
 

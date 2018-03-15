@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include <algorithm>
 #include "wikibase.h"
 
 TEST(WikibaseAPI, site_info) {
@@ -57,7 +58,17 @@ TEST(WikibaseEntity, detail_check) {
 	ASSERT_EQ(count_von_count.getPageID(),13925) ;
 	ASSERT_EQ(count_von_count.getPageTitle(),"Q12345") ;
 
+	// Claims
+	ASSERT_TRUE(count_von_count.hasClaimsForProperty("P31")) ;
+	ASSERT_FALSE(count_von_count.hasClaimsForProperty("P007")) ;
 
+	auto res1 = count_von_count.getTargetItemsForProperty("P31") ;
+	ASSERT_NE(std::find(res1.begin(),res1.end(),"Q30061417"),res1.end()) ; // This might change on Wikidata
+
+	auto res2 = count_von_count.getStringsForProperty("P345") ;
+	ASSERT_NE(std::find(res2.begin(),res2.end(),"ch0000709"),res2.end()) ; // This might change on Wikidata
+
+	// Badges
 	WikibaseEntity angkor_wat ("Q43473",api) ;
 	ASSERT_TRUE(angkor_wat.hasBadgesInWiki("enwiki")) ;
 	ASSERT_FALSE(angkor_wat.hasBadgesInWiki("elwiki")) ; // This might change on Wikidata

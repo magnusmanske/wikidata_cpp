@@ -121,3 +121,43 @@ vector <string> WikibaseEntity::getBadgesInWiki ( string wiki ) {
 	}
 	return ret ;
 }
+
+bool WikibaseEntity::hasClaimsForProperty ( WikibaseID property ) {
+	if ( !isDataLoaded() ) throw WikibaseException ( "Data not loaded" , "WikibaseEntity::hasClaimsForProperty" ) ;
+	if ( j.count("claims") == 0 ) return false ;
+	if ( j["claims"].count(property) == 0 ) return false ;
+	return !j["claims"][property].empty() ;
+}
+
+json WikibaseEntity::getClaimsForProperty ( WikibaseID property ) {
+	json ret ;
+	if ( !hasClaimsForProperty(property) ) return ret ;
+	return j["claims"][property] ;
+}
+
+
+vector <WikibaseID> WikibaseEntity::getTargetItemsFromClaims ( const json &claims ) {
+	vector <WikibaseID> ret ;
+	for ( auto &claim:claims ) {
+		if ( claim.at("type") != "statement" ) continue ;
+		if ( claim.count("mainsnak") == 0 ) continue ;
+		if ( claim["mainsnak"].at("snaktype") != "value" ) continue ;
+		if ( claim["mainsnak"].at("datatype") != "wikibase-item" ) continue ;
+		if ( claim["mainsnak"].at("datavalue").at("type") != "wikibase-entityid" ) continue ;
+		ret.push_back ( claim["mainsnak"]["datavalue"]["value"].at("id") ) ;
+	}
+	return ret ;
+}
+
+vector <string> WikibaseEntity::getStringsFromClaims ( const json &claims ) {
+	vector <string> ret ;
+	for ( auto &claim:claims ) {
+		if ( claim.at("type") != "statement" ) continue ;
+		if ( claim.count("mainsnak") == 0 ) continue ;
+		if ( claim["mainsnak"].at("snaktype") != "value" ) continue ;
+//		if ( claim["mainsnak"].at("datatype") != "wikibase-item" ) continue ; // string, external-id??
+		if ( claim["mainsnak"].at("datavalue").at("type") != "string" ) continue ;
+		ret.push_back ( claim["mainsnak"]["datavalue"].at("value") ) ;
+	}
+	return ret ;
+}
