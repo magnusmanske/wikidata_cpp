@@ -61,13 +61,14 @@ public:
 	string getEntityURL() ;
 	string getWebURL() ;
 
-	// Property access
+	// Basic item properties
 	string getEntityType () { return j.at("type") ; }
 	int32_t getPageID () { return j.at("pageid") ; }
 	int32_t getLastRevisionID () { return j.at("lastrevid") ; }
 	string getPageTitle() { return j.at("title") ; }
 	string getLastModificationDate() { return j.at("modified") ; }
 
+	// Labels / descriptions / aliases / sitelinks
 	bool hasLabelInLanguage ( string language_code ) ;
 	bool hasAliasesInLanguage ( string language_code ) ;
 	bool hasDescriptionInLanguage ( string language_code ) ;
@@ -79,17 +80,23 @@ public:
 	string getSitelinkToWiki ( string wiki ) ;
 	vector <string> getBadgesInWiki ( string wiki ) ;
 
+	// Claims ("string" works for strings, external IDs, filenames etc.)
 	bool hasClaimsForProperty ( WikibaseID property ) ;
 	json getClaimsForProperty ( WikibaseID property ) ;
+
 	WikibaseID getTargetItemFromSnak ( const json &snak ) ;
 	string getStringFromSnak ( const json &snak ) ;
+
 	vector <WikibaseID> getTargetItemsFromClaims ( const json &claims ) ;
-	vector <WikibaseID> getTargetItemsForProperty ( WikibaseID property ) { return getTargetItemsFromClaims ( getClaimsForProperty ( property ) ) ; }
 	vector <string> getStringsFromClaims ( const json &claims ) ;
+
+	vector <WikibaseID> getTargetItemsForProperty ( WikibaseID property ) { return getTargetItemsFromClaims ( getClaimsForProperty ( property ) ) ; }
 	vector <string> getStringsForProperty ( WikibaseID property ) { return getStringsFromClaims ( getClaimsForProperty ( property ) ) ; }
 
+	// TODO quantity, time, geo
+	// TODO qualifiers, references
+	// TODO ranks
 
-	// TODO: claims
 
 protected:
 	WikibaseID id ;
