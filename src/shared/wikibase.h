@@ -107,9 +107,9 @@ public:
 	WikibaseEntity getEntity ( WikibaseID id , bool autoload = false ) ;
 
 protected:
-	string joinEntityIDs ( const WikibaseEntityList &ids , const string &separator ) ;
 	map <WikibaseID,WikibaseEntity> entities ;
 	std::shared_ptr<WikibaseAPI> api ;
+	uint32_t max_threads = 5 ;
 } ;
 
 #endif

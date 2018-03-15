@@ -145,7 +145,7 @@ WikibaseID WikibaseEntity::getTargetItemFromSnak ( const json &snak ) {
 
 string WikibaseEntity::getStringFromSnak ( const json &snak ) {
 	if ( snak.at("snaktype") != "value" ) return "" ;
-//		if ( claim["mainsnak"].at("datatype") != "wikibase-item" ) continue ; // string, external-id??
+//		if ( claim["mainsnak"].at("datatype") != "wikibase-item" ) continue ; // string, external-id, commons media??
 	if ( snak.at("datavalue").at("type") != "string" ) return "" ;
 	return snak["datavalue"].at("value") ;
 }
