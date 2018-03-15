@@ -36,22 +36,33 @@ TEST(WikibaseEntity, id_check) {
 
 TEST(WikibaseEntity, detail_check) {
 	auto api = std::make_shared<WikibaseAPI>() ;
-	WikibaseEntity item ("Q12345",api) ;
-	ASSERT_TRUE(item.hasLabelInLanguage("en")) ;
-	ASSERT_FALSE(item.hasLabelInLanguage("this-is-not-a-language-code")) ;
-	ASSERT_EQ(item.getLabelInLanguage("en"),"Count von Count") ;
+	WikibaseEntity count_von_count ("Q12345",api) ;
+	ASSERT_TRUE(count_von_count.hasLabelInLanguage("en")) ;
+	ASSERT_FALSE(count_von_count.hasLabelInLanguage("this-is-not-a-language-code")) ;
+	ASSERT_EQ(count_von_count.getLabelInLanguage("en"),"Count von Count") ;
 
-	ASSERT_TRUE(item.hasDescriptionInLanguage("en")) ;
-	ASSERT_FALSE(item.hasDescriptionInLanguage("this-is-not-a-language-code")) ;
-	ASSERT_EQ(item.getDescriptionInLanguage("en"),"character on Sesame Street") ; // This might change on source
+	ASSERT_TRUE(count_von_count.hasDescriptionInLanguage("en")) ;
+	ASSERT_FALSE(count_von_count.hasDescriptionInLanguage("this-is-not-a-language-code")) ;
+	ASSERT_EQ(count_von_count.getDescriptionInLanguage("en"),"character on Sesame Street") ; // This might change on Wikidata
 
-	ASSERT_TRUE(item.hasAliasesInLanguage("en")) ;
-	ASSERT_FALSE(item.hasAliasesInLanguage("this-is-not-a-language-code")) ;
-	ASSERT_GE(item.getAliasesInLanguage("en").size(),1) ;
+	ASSERT_TRUE(count_von_count.hasAliasesInLanguage("en")) ;
+	ASSERT_FALSE(count_von_count.hasAliasesInLanguage("this-is-not-a-language-code")) ;
+	ASSERT_GE(count_von_count.getAliasesInLanguage("en").size(),1) ;
 
-	ASSERT_EQ(item.getEntityType(),"item") ;
-	ASSERT_EQ(item.getPageID(),13925) ;
-	ASSERT_EQ(item.getPageTitle(),"Q12345") ;
+	ASSERT_TRUE(count_von_count.hasSitelinkToWiki("enwiki")) ;
+	ASSERT_FALSE(count_von_count.hasSitelinkToWiki("this-is-not-a-wiki-code")) ;
+	ASSERT_EQ(count_von_count.getSitelinkToWiki("enwiki"),"Count von Count") ;
+
+	ASSERT_EQ(count_von_count.getEntityType(),"item") ;
+	ASSERT_EQ(count_von_count.getPageID(),13925) ;
+	ASSERT_EQ(count_von_count.getPageTitle(),"Q12345") ;
+
+
+	WikibaseEntity angkor_wat ("Q43473",api) ;
+	ASSERT_TRUE(angkor_wat.hasBadgesInWiki("enwiki")) ;
+	ASSERT_FALSE(angkor_wat.hasBadgesInWiki("elwiki")) ; // This might change on Wikidata
+	ASSERT_FALSE(angkor_wat.hasBadgesInWiki("this-is-not-a-wiki-code")) ;
+	ASSERT_GE(angkor_wat.getBadgesInWiki("enwiki").size(),1) ;
 }
 
 TEST(WikibaseEntities, load_check) {
@@ -59,10 +70,12 @@ TEST(WikibaseEntities, load_check) {
 	WikibaseEntityList entities = { "Q12345","P31","Q12345" } ;
 	try {
 		wel.loadEntities ( entities ) ;
-	} catch ( exception &e ) {
+	} catch ( WikibaseException &e ) {
 		cerr << "!!" << e.what() << endl ;
 	} catch ( string s ) {
 		cerr << "!!!" << s << endl ;
+	} catch ( ... ) {
+		cerr << "Something is wrong" << endl ;
 	}
 	ASSERT_EQ(wel.size(),2) ;
 }

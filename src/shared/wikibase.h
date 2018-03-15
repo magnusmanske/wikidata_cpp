@@ -62,17 +62,25 @@ public:
 	string getWebURL() ;
 
 	// Property access
-	bool hasLabelInLanguage ( string language_code ) ;
-	bool hasAliasesInLanguage ( string language_code ) ;
-	bool hasDescriptionInLanguage ( string language_code ) ;
-	string getLabelInLanguage ( string language_code ) ;
-	vector <string> getAliasesInLanguage ( string language_code ) ;
-	string getDescriptionInLanguage ( string language_code ) ;
 	string getEntityType () { return j.at("type") ; }
 	int32_t getPageID () { return j.at("pageid") ; }
 	int32_t getLastRevisionID () { return j.at("lastrevid") ; }
 	string getPageTitle() { return j.at("title") ; }
 	string getLastModificationDate() { return j.at("modified") ; }
+
+	bool hasLabelInLanguage ( string language_code ) ;
+	bool hasAliasesInLanguage ( string language_code ) ;
+	bool hasDescriptionInLanguage ( string language_code ) ;
+	bool hasSitelinkToWiki ( string wiki ) ;
+	bool hasBadgesInWiki ( string wiki ) ;
+	string getLabelInLanguage ( string language_code ) ;
+	vector <string> getAliasesInLanguage ( string language_code ) ;
+	string getDescriptionInLanguage ( string language_code ) ;
+	string getSitelinkToWiki ( string wiki ) ;
+	vector <string> getBadgesInWiki ( string wiki ) ;
+
+
+	// TODO: claims
 
 protected:
 	WikibaseID id ;

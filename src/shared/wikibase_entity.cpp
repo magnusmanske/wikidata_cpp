@@ -84,7 +84,8 @@ string WikibaseEntity::getDescriptionInLanguage ( string language_code ) {
 bool WikibaseEntity::hasAliasesInLanguage ( string language_code ) {
 	if ( !isDataLoaded() ) throw WikibaseException ( "Data not loaded" , "WikibaseEntity::hasAliasesInLanguage" ) ;
 	if ( j.count("aliases") == 0 ) return false ;
-	return j["aliases"].count(language_code) > 0 ;
+	if ( j["aliases"].count(language_code) == 0 ) return false ;
+	return !j["aliases"][language_code].empty() ;
 }
 
 vector <string> WikibaseEntity::getAliasesInLanguage ( string language_code ) {
@@ -92,6 +93,31 @@ vector <string> WikibaseEntity::getAliasesInLanguage ( string language_code ) {
 	if ( !hasAliasesInLanguage(language_code) ) return ret ;
 	for ( auto& v:j["aliases"][language_code] ) {
 		ret.push_back ( v.at("value") ) ;
+	}
+	return ret ;
+}
+
+bool WikibaseEntity::hasSitelinkToWiki ( string wiki ) {
+	if ( !isDataLoaded() ) throw WikibaseException ( "Data not loaded" , "WikibaseEntity::hasSitelinkToWiki" ) ;
+	if ( j.count("sitelinks") == 0 ) return false ;
+	return j["sitelinks"].count(wiki) > 0 ;	
+}
+
+string WikibaseEntity::getSitelinkToWiki ( string wiki ) {
+	if ( !hasSitelinkToWiki(wiki) ) return "" ;
+	return j["sitelinks"][wiki].at("title") ;
+}
+
+bool WikibaseEntity::hasBadgesInWiki ( string wiki ) {
+	if ( !hasSitelinkToWiki(wiki) ) return false ;
+	return !j["sitelinks"][wiki]["badges"].empty() ;
+}
+
+vector <string> WikibaseEntity::getBadgesInWiki ( string wiki ) {
+	vector <string> ret ;
+	if ( !hasBadgesInWiki(wiki) ) return ret ;
+	for ( auto& v:j["sitelinks"][wiki].at("badges") ) {
+		ret.push_back ( v ) ;
 	}
 	return ret ;
 }
